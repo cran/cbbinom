@@ -8,16 +8,7 @@
 \alias{rcbbinom}
 \title{The Continuous Beta-Binomial Distribution}
 \usage{
-dcbbinom(
-  x,
-  size,
-  alpha = 1,
-  beta = 1,
-  ncp = 0,
-  log = FALSE,
-  tol = 1e-06,
-  max_iter = 10000L
-)
+dcbbinom(x, size, alpha = 1, beta = 1, ncp = 0, log = FALSE, prec = NULL)
 
 pcbbinom(
   q,
@@ -27,8 +18,7 @@ pcbbinom(
   ncp = 0,
   lower.tail = TRUE,
   log.p = FALSE,
-  tol = 1e-06,
-  max_iter = 10000L
+  prec = NULL
 )
 
 qcbbinom(
@@ -39,10 +29,9 @@ qcbbinom(
   ncp = 0,
   lower.tail = TRUE,
   log.p = FALSE,
-  p_tol = 1e-06,
-  p_max_iter = 10000L,
-  root_tol = 1e-06,
-  root_max_iter = 10000L
+  prec = NULL,
+  tol = 1e-06,
+  max_iter = 10000L
 )
 
 rcbbinom(
@@ -51,10 +40,9 @@ rcbbinom(
   alpha = 1,
   beta = 1,
   ncp = 0,
-  p_tol = 1e-06,
-  p_max_iter = 10000L,
-  root_tol = 1e-06,
-  root_max_iter = 10000L
+  prec = NULL,
+  tol = 1e-06,
+  max_iter = 10000L
 )
 }
 \arguments{
@@ -68,16 +56,16 @@ rcbbinom(
 
 \item{log, log.p}{logical; if TRUE, probabilities p are given as log(p).}
 
-\item{tol, max_iter}{arguments passed on to \code{\link{gen_hypergeo}}.}
+\item{prec}{arguments passed on to \code{\link[hypergeo2]{genhypergeo}},
+vectorized and recycled along with distribution parameters.}
 
 \item{lower.tail}{logical; if TRUE (default), probabilities are
     \eqn{P[X \le x]}, otherwise, \eqn{P[X > x]}.}
 
 \item{p}{vector of probabilities.}
 
-\item{p_tol, p_max_iter}{same as \code{tol}, \code{max_iter}.}
-
-\item{root_tol, root_max_iter}{arguments passed on to \code{\link[stats]{uniroot}}.}
+\item{tol, max_iter}{arguments passed on to \code{\link[stats]{uniroot}},
+vectorized and recycled along with distribution parameters.}
 
 \item{n}{number of observations. If \code{length(n) > 1}, the length
     is taken to be the number required.}
@@ -96,7 +84,7 @@ Only the first elements of the logical arguments are used.
 }
 \description{
 Density, distribution function, quantile function and random generation for
-a continuous analog to the beta-binomial distribution with parameters \code{size}
+a continuous analog to the beta-binomial distribution with parameters \code{size},
 \code{alpha} and \code{beta}. The usage and help pages are modeled
 on the d-p-q-r families of functions for the commonly-used distributions
 in the \code{stats} package.
@@ -110,7 +98,7 @@ is the incomplete beta function.
 
 When simplified, the distribution becomes:
 \deqn{P(x|n,\alpha,\beta)=\frac{\Gamma(n+1)B(n+1-x+\beta,\alpha)}{\Gamma(x)\Gamma(n+2-x)B(\alpha,\beta)}{}_3F_2(a;b;z),}
-where \eqn{{}_3F_2(a;b;z)} is \link[=gen_hypergeo]{generalized hypergeometric function}, \eqn{a=\{1-x,n+1-x,n+1-x+\beta\}},
+where \eqn{{}_3F_2(a;b;z)} is \link[hypergeo2:genhypergeo]{generalized hypergeometric function}, \eqn{a=\{1-x,n+1-x,n+1-x+\beta\}},
 \eqn{b=\{n+2-x,n+1-x+\alpha+\beta\}}, \eqn{z=1}.
 
 Heuristically speaking, this distribution spreads the standard probability mass
@@ -120,25 +108,22 @@ discrete beta-binomial but shifted slightly to the right. The support of the con
 beta-binomial is \code{[0, size + 1]}, and the mean is approximately
 \code{size * alpha / (alpha + beta) + 1/2}.
 
-Supplying \code{ncp} moves the support of beta-binomial to \code{[ncp, size + 1 + ncp]}, e.g.
-for the continuous beta-binomial with non-shifted mean, use \code{ncp = -0.5}.
+Supplying \code{ncp != 0} moves the support of beta-binomial to \code{[ncp, size + 1 + ncp]}. For example,
+to build a continuous beta-binomial with approximately non-shifted mean, use \code{ncp = -0.5}.
+
+These functions are also available in \code{\link[Rcpp:Rcpp-package]{Rcpp}}
+as \code{cbbinom::cpp_[d/p/q/r]cbbinom()}, and their non-vectorized versions
+in \code{\link[Rcpp:Rcpp-package]{Rcpp}} as \code{cbbinom::[d/p/q/r]cbbinom_()}.
+To use them, please use \code{[[Rcpp::depends(cbbinom)]]} and \code{#include <cbbinom.h>}.
 }
 \note{
 Change log:
 \itemize{
 \item{0.1.0 Xiurui Zhu - Initiate the function.}
+\item{0.2.0 Xiurui Zhu - Re-implement distribution function with \code{\link[BH:BH-package]{BH}} package,
+add \code{NULL} default tolerance, and add precision parameters.}
 }
 }
-\section{Numerical computation of the density function}{
-
-For simplicity, the density function is computed numerically through differentiation.
-To achieve higher numerical resolution (given that \eqn{d\ln{u}/du>1,0<u<1}), it is computed as:
-\deqn{p(x|n,\alpha,\beta)=\frac{\partial{P(x|n,\alpha,\beta)}}{\partial{x}}=\frac{\partial\exp[\ln{P(x|n,\alpha,\beta)}]}{\partial{x}}}
-When simplified, it becomes:
-\deqn{p(x|n,\alpha,\beta)=\frac{\partial\exp[\ln{P(x|n,\alpha,\beta)}]}{\partial\ln{P(x|n,\alpha,\beta)}}\frac{\partial\ln{P(x|n,\alpha,\beta)}}{\partial{x}}=\frac{\partial\ln{P(x|n,\alpha,\beta)}}{\partial{x}}P(x|n,\alpha,\beta),}
-where the first term is computed numerically and the second term is the distribution function.
-}
-
 \examples{
 # Density function
 dcbbinom(x = 5, size = 10, alpha = 2, beta = 4)

@@ -24,17 +24,17 @@ namespace cbbinom {
         }
     }
 
-    inline NumericVector cpp_pcbbinom(const NumericVector& q, const NumericVector& size, const NumericVector& alpha, const NumericVector& beta, const bool& lower_tail, const bool& log_p, const NumericVector& tol, const IntegerVector& max_iter) {
-        typedef SEXP(*Ptr_cpp_pcbbinom)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+    inline NumericVector cpp_pcbbinom(const NumericVector& q, const NumericVector& size, const NumericVector& alpha, const NumericVector& beta, const bool& lower_tail, const bool& log_p, const Nullable<List>& prec) {
+        typedef SEXP(*Ptr_cpp_pcbbinom)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_cpp_pcbbinom p_cpp_pcbbinom = NULL;
         if (p_cpp_pcbbinom == NULL) {
-            validateSignature("NumericVector(*cpp_pcbbinom)(const NumericVector&,const NumericVector&,const NumericVector&,const NumericVector&,const bool&,const bool&,const NumericVector&,const IntegerVector&)");
+            validateSignature("NumericVector(*cpp_pcbbinom)(const NumericVector&,const NumericVector&,const NumericVector&,const NumericVector&,const bool&,const bool&,const Nullable<List>&)");
             p_cpp_pcbbinom = (Ptr_cpp_pcbbinom)R_GetCCallable("cbbinom", "_cbbinom_cpp_pcbbinom");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_cpp_pcbbinom(Shield<SEXP>(Rcpp::wrap(q)), Shield<SEXP>(Rcpp::wrap(size)), Shield<SEXP>(Rcpp::wrap(alpha)), Shield<SEXP>(Rcpp::wrap(beta)), Shield<SEXP>(Rcpp::wrap(lower_tail)), Shield<SEXP>(Rcpp::wrap(log_p)), Shield<SEXP>(Rcpp::wrap(tol)), Shield<SEXP>(Rcpp::wrap(max_iter)));
+            rcpp_result_gen = p_cpp_pcbbinom(Shield<SEXP>(Rcpp::wrap(q)), Shield<SEXP>(Rcpp::wrap(size)), Shield<SEXP>(Rcpp::wrap(alpha)), Shield<SEXP>(Rcpp::wrap(beta)), Shield<SEXP>(Rcpp::wrap(lower_tail)), Shield<SEXP>(Rcpp::wrap(log_p)), Shield<SEXP>(Rcpp::wrap(prec)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -45,17 +45,17 @@ namespace cbbinom {
         return Rcpp::as<NumericVector >(rcpp_result_gen);
     }
 
-    inline NumericVector cpp_qcbbinom(NumericVector p, const NumericVector& size, const NumericVector& alpha, const NumericVector& beta, const bool& lower_tail, const bool& log_p, const NumericVector& p_tol, const IntegerVector& p_max_iter, NumericVector root_tol, IntegerVector root_max_iter) {
-        typedef SEXP(*Ptr_cpp_qcbbinom)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+    inline NumericVector cpp_qcbbinom(const NumericVector& p, const NumericVector& size, const NumericVector& alpha, const NumericVector& beta, const bool& lower_tail, const bool& log_p, const Nullable<List>& prec, const NumericVector& tol, const IntegerVector& max_iter) {
+        typedef SEXP(*Ptr_cpp_qcbbinom)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_cpp_qcbbinom p_cpp_qcbbinom = NULL;
         if (p_cpp_qcbbinom == NULL) {
-            validateSignature("NumericVector(*cpp_qcbbinom)(NumericVector,const NumericVector&,const NumericVector&,const NumericVector&,const bool&,const bool&,const NumericVector&,const IntegerVector&,NumericVector,IntegerVector)");
+            validateSignature("NumericVector(*cpp_qcbbinom)(const NumericVector&,const NumericVector&,const NumericVector&,const NumericVector&,const bool&,const bool&,const Nullable<List>&,const NumericVector&,const IntegerVector&)");
             p_cpp_qcbbinom = (Ptr_cpp_qcbbinom)R_GetCCallable("cbbinom", "_cbbinom_cpp_qcbbinom");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_cpp_qcbbinom(Shield<SEXP>(Rcpp::wrap(p)), Shield<SEXP>(Rcpp::wrap(size)), Shield<SEXP>(Rcpp::wrap(alpha)), Shield<SEXP>(Rcpp::wrap(beta)), Shield<SEXP>(Rcpp::wrap(lower_tail)), Shield<SEXP>(Rcpp::wrap(log_p)), Shield<SEXP>(Rcpp::wrap(p_tol)), Shield<SEXP>(Rcpp::wrap(p_max_iter)), Shield<SEXP>(Rcpp::wrap(root_tol)), Shield<SEXP>(Rcpp::wrap(root_max_iter)));
+            rcpp_result_gen = p_cpp_qcbbinom(Shield<SEXP>(Rcpp::wrap(p)), Shield<SEXP>(Rcpp::wrap(size)), Shield<SEXP>(Rcpp::wrap(alpha)), Shield<SEXP>(Rcpp::wrap(beta)), Shield<SEXP>(Rcpp::wrap(lower_tail)), Shield<SEXP>(Rcpp::wrap(log_p)), Shield<SEXP>(Rcpp::wrap(prec)), Shield<SEXP>(Rcpp::wrap(tol)), Shield<SEXP>(Rcpp::wrap(max_iter)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -66,17 +66,17 @@ namespace cbbinom {
         return Rcpp::as<NumericVector >(rcpp_result_gen);
     }
 
-    inline NumericMatrix dcbblp(const NumericVector& x, const NumericVector& m, const NumericVector& a, const NumericVector& b, const NumericVector& tol, const IntegerVector& max_iter) {
-        typedef SEXP(*Ptr_dcbblp)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
-        static Ptr_dcbblp p_dcbblp = NULL;
-        if (p_dcbblp == NULL) {
-            validateSignature("NumericMatrix(*dcbblp)(const NumericVector&,const NumericVector&,const NumericVector&,const NumericVector&,const NumericVector&,const IntegerVector&)");
-            p_dcbblp = (Ptr_dcbblp)R_GetCCallable("cbbinom", "_cbbinom_dcbblp");
+    inline NumericVector cpp_dcbbinom(const NumericVector& x, const NumericVector& size, const NumericVector& alpha, const NumericVector& beta, const bool& log, const Nullable<List>& prec) {
+        typedef SEXP(*Ptr_cpp_dcbbinom)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+        static Ptr_cpp_dcbbinom p_cpp_dcbbinom = NULL;
+        if (p_cpp_dcbbinom == NULL) {
+            validateSignature("NumericVector(*cpp_dcbbinom)(const NumericVector&,const NumericVector&,const NumericVector&,const NumericVector&,const bool&,const Nullable<List>&)");
+            p_cpp_dcbbinom = (Ptr_cpp_dcbbinom)R_GetCCallable("cbbinom", "_cbbinom_cpp_dcbbinom");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_dcbblp(Shield<SEXP>(Rcpp::wrap(x)), Shield<SEXP>(Rcpp::wrap(m)), Shield<SEXP>(Rcpp::wrap(a)), Shield<SEXP>(Rcpp::wrap(b)), Shield<SEXP>(Rcpp::wrap(tol)), Shield<SEXP>(Rcpp::wrap(max_iter)));
+            rcpp_result_gen = p_cpp_dcbbinom(Shield<SEXP>(Rcpp::wrap(x)), Shield<SEXP>(Rcpp::wrap(size)), Shield<SEXP>(Rcpp::wrap(alpha)), Shield<SEXP>(Rcpp::wrap(beta)), Shield<SEXP>(Rcpp::wrap(log)), Shield<SEXP>(Rcpp::wrap(prec)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -84,20 +84,20 @@ namespace cbbinom {
             throw Rcpp::LongjumpException(rcpp_result_gen);
         if (rcpp_result_gen.inherits("try-error"))
             throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
-        return Rcpp::as<NumericMatrix >(rcpp_result_gen);
+        return Rcpp::as<NumericVector >(rcpp_result_gen);
     }
 
-    inline NumericVector cpp_rcbbinom(const int& n, const NumericVector& size, const NumericVector& alpha, const NumericVector& beta, const NumericVector& p_tol, const IntegerVector& p_max_iter, const NumericVector& root_tol, const IntegerVector& root_max_iter) {
-        typedef SEXP(*Ptr_cpp_rcbbinom)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+    inline NumericVector cpp_rcbbinom(const int& n, const NumericVector& size, const NumericVector& alpha, const NumericVector& beta, const Nullable<List>& prec, const NumericVector& tol, const IntegerVector& max_iter) {
+        typedef SEXP(*Ptr_cpp_rcbbinom)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_cpp_rcbbinom p_cpp_rcbbinom = NULL;
         if (p_cpp_rcbbinom == NULL) {
-            validateSignature("NumericVector(*cpp_rcbbinom)(const int&,const NumericVector&,const NumericVector&,const NumericVector&,const NumericVector&,const IntegerVector&,const NumericVector&,const IntegerVector&)");
+            validateSignature("NumericVector(*cpp_rcbbinom)(const int&,const NumericVector&,const NumericVector&,const NumericVector&,const Nullable<List>&,const NumericVector&,const IntegerVector&)");
             p_cpp_rcbbinom = (Ptr_cpp_rcbbinom)R_GetCCallable("cbbinom", "_cbbinom_cpp_rcbbinom");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_cpp_rcbbinom(Shield<SEXP>(Rcpp::wrap(n)), Shield<SEXP>(Rcpp::wrap(size)), Shield<SEXP>(Rcpp::wrap(alpha)), Shield<SEXP>(Rcpp::wrap(beta)), Shield<SEXP>(Rcpp::wrap(p_tol)), Shield<SEXP>(Rcpp::wrap(p_max_iter)), Shield<SEXP>(Rcpp::wrap(root_tol)), Shield<SEXP>(Rcpp::wrap(root_max_iter)));
+            rcpp_result_gen = p_cpp_rcbbinom(Shield<SEXP>(Rcpp::wrap(n)), Shield<SEXP>(Rcpp::wrap(size)), Shield<SEXP>(Rcpp::wrap(alpha)), Shield<SEXP>(Rcpp::wrap(beta)), Shield<SEXP>(Rcpp::wrap(prec)), Shield<SEXP>(Rcpp::wrap(tol)), Shield<SEXP>(Rcpp::wrap(max_iter)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -108,17 +108,80 @@ namespace cbbinom {
         return Rcpp::as<NumericVector >(rcpp_result_gen);
     }
 
-    inline double gen_hypergeo(NumericVector U, NumericVector L, const double& x, const double& tol, const R_xlen_t& max_iter, const bool& check_mode, const bool& log) {
-        typedef SEXP(*Ptr_gen_hypergeo)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
-        static Ptr_gen_hypergeo p_gen_hypergeo = NULL;
-        if (p_gen_hypergeo == NULL) {
-            validateSignature("double(*gen_hypergeo)(NumericVector,NumericVector,const double&,const double&,const R_xlen_t&,const bool&,const bool&)");
-            p_gen_hypergeo = (Ptr_gen_hypergeo)R_GetCCallable("cbbinom", "_cbbinom_gen_hypergeo");
+    inline double pcbbinom_(const double& q, const double& size, const double& alpha, const double& beta, const bool& lower_tail, const bool& log_p, const Nullable<IntegerVector>& prec) {
+        typedef SEXP(*Ptr_pcbbinom_)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+        static Ptr_pcbbinom_ p_pcbbinom_ = NULL;
+        if (p_pcbbinom_ == NULL) {
+            validateSignature("double(*pcbbinom_)(const double&,const double&,const double&,const double&,const bool&,const bool&,const Nullable<IntegerVector>&)");
+            p_pcbbinom_ = (Ptr_pcbbinom_)R_GetCCallable("cbbinom", "_cbbinom_pcbbinom_");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_gen_hypergeo(Shield<SEXP>(Rcpp::wrap(U)), Shield<SEXP>(Rcpp::wrap(L)), Shield<SEXP>(Rcpp::wrap(x)), Shield<SEXP>(Rcpp::wrap(tol)), Shield<SEXP>(Rcpp::wrap(max_iter)), Shield<SEXP>(Rcpp::wrap(check_mode)), Shield<SEXP>(Rcpp::wrap(log)));
+            rcpp_result_gen = p_pcbbinom_(Shield<SEXP>(Rcpp::wrap(q)), Shield<SEXP>(Rcpp::wrap(size)), Shield<SEXP>(Rcpp::wrap(alpha)), Shield<SEXP>(Rcpp::wrap(beta)), Shield<SEXP>(Rcpp::wrap(lower_tail)), Shield<SEXP>(Rcpp::wrap(log_p)), Shield<SEXP>(Rcpp::wrap(prec)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<double >(rcpp_result_gen);
+    }
+
+    inline double dcbbinom_(const double& x, const double& size, const double& alpha, const double& beta, const bool& log, const Nullable<IntegerVector>& prec) {
+        typedef SEXP(*Ptr_dcbbinom_)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+        static Ptr_dcbbinom_ p_dcbbinom_ = NULL;
+        if (p_dcbbinom_ == NULL) {
+            validateSignature("double(*dcbbinom_)(const double&,const double&,const double&,const double&,const bool&,const Nullable<IntegerVector>&)");
+            p_dcbbinom_ = (Ptr_dcbbinom_)R_GetCCallable("cbbinom", "_cbbinom_dcbbinom_");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_dcbbinom_(Shield<SEXP>(Rcpp::wrap(x)), Shield<SEXP>(Rcpp::wrap(size)), Shield<SEXP>(Rcpp::wrap(alpha)), Shield<SEXP>(Rcpp::wrap(beta)), Shield<SEXP>(Rcpp::wrap(log)), Shield<SEXP>(Rcpp::wrap(prec)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<double >(rcpp_result_gen);
+    }
+
+    inline double qcbbinom_(double p, const double& size, const double& alpha, const double& beta, const bool& lower_tail, const bool& log_p, const Nullable<IntegerVector>& prec, double tol, int max_iter) {
+        typedef SEXP(*Ptr_qcbbinom_)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+        static Ptr_qcbbinom_ p_qcbbinom_ = NULL;
+        if (p_qcbbinom_ == NULL) {
+            validateSignature("double(*qcbbinom_)(double,const double&,const double&,const double&,const bool&,const bool&,const Nullable<IntegerVector>&,double,int)");
+            p_qcbbinom_ = (Ptr_qcbbinom_)R_GetCCallable("cbbinom", "_cbbinom_qcbbinom_");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_qcbbinom_(Shield<SEXP>(Rcpp::wrap(p)), Shield<SEXP>(Rcpp::wrap(size)), Shield<SEXP>(Rcpp::wrap(alpha)), Shield<SEXP>(Rcpp::wrap(beta)), Shield<SEXP>(Rcpp::wrap(lower_tail)), Shield<SEXP>(Rcpp::wrap(log_p)), Shield<SEXP>(Rcpp::wrap(prec)), Shield<SEXP>(Rcpp::wrap(tol)), Shield<SEXP>(Rcpp::wrap(max_iter)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<double >(rcpp_result_gen);
+    }
+
+    inline double rcbbinom_(const double& size, const double& alpha, const double& beta, const bool& lower_tail, const bool& log_p, const Nullable<IntegerVector>& prec, double tol, int max_iter) {
+        typedef SEXP(*Ptr_rcbbinom_)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+        static Ptr_rcbbinom_ p_rcbbinom_ = NULL;
+        if (p_rcbbinom_ == NULL) {
+            validateSignature("double(*rcbbinom_)(const double&,const double&,const double&,const bool&,const bool&,const Nullable<IntegerVector>&,double,int)");
+            p_rcbbinom_ = (Ptr_rcbbinom_)R_GetCCallable("cbbinom", "_cbbinom_rcbbinom_");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_rcbbinom_(Shield<SEXP>(Rcpp::wrap(size)), Shield<SEXP>(Rcpp::wrap(alpha)), Shield<SEXP>(Rcpp::wrap(beta)), Shield<SEXP>(Rcpp::wrap(lower_tail)), Shield<SEXP>(Rcpp::wrap(log_p)), Shield<SEXP>(Rcpp::wrap(prec)), Shield<SEXP>(Rcpp::wrap(tol)), Shield<SEXP>(Rcpp::wrap(max_iter)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();

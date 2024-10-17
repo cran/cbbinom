@@ -1,7 +1,7 @@
 #' The Continuous Beta-Binomial Distribution
 #'
 #' Density, distribution function, quantile function and random generation for
-#' a continuous analog to the beta-binomial distribution with parameters \code{size}
+#' a continuous analog to the beta-binomial distribution with parameters \code{size},
 #' \code{alpha} and \code{beta}. The usage and help pages are modeled
 #' on the d-p-q-r families of functions for the commonly-used distributions
 #' in the \code{stats} package.
@@ -14,7 +14,7 @@
 #'
 #' When simplified, the distribution becomes:
 #' \deqn{P(x|n,\alpha,\beta)=\frac{\Gamma(n+1)B(n+1-x+\beta,\alpha)}{\Gamma(x)\Gamma(n+2-x)B(\alpha,\beta)}{}_3F_2(a;b;z),}
-#' where \eqn{{}_3F_2(a;b;z)} is [generalized hypergeometric function][gen_hypergeo], \eqn{a=\{1-x,n+1-x,n+1-x+\beta\}},
+#' where \eqn{{}_3F_2(a;b;z)} is \link[hypergeo2:genhypergeo]{generalized hypergeometric function}, \eqn{a=\{1-x,n+1-x,n+1-x+\beta\}},
 #' \eqn{b=\{n+2-x,n+1-x+\alpha+\beta\}}, \eqn{z=1}.
 #'
 #' Heuristically speaking, this distribution spreads the standard probability mass
@@ -24,16 +24,22 @@
 #' beta-binomial is \code{[0, size + 1]}, and the mean is approximately
 #' \code{size * alpha / (alpha + beta) + 1/2}.
 #'
-#' Supplying \code{ncp} moves the support of beta-binomial to \code{[ncp, size + 1 + ncp]}, e.g.
-#' for the continuous beta-binomial with non-shifted mean, use \code{ncp = -0.5}.
+#' Supplying \code{ncp != 0} moves the support of beta-binomial to \code{[ncp, size + 1 + ncp]}. For example,
+#' to build a continuous beta-binomial with approximately non-shifted mean, use \code{ncp = -0.5}.
+#'
+#' These functions are also available in \code{\link[Rcpp:Rcpp-package]{Rcpp}}
+#' as \code{cbbinom::cpp_[d/p/q/r]cbbinom()}, and their non-vectorized versions
+#' in \code{\link[Rcpp:Rcpp-package]{Rcpp}} as \code{cbbinom::[d/p/q/r]cbbinom_()}.
+#' To use them, please use \code{[[Rcpp::depends(cbbinom)]]} and \code{#include <cbbinom.h>}.
 #'
 #' @param x,q vector of quantiles.
 #' @param alpha,beta non-negative parameters of the Beta distribution.
 #' @inheritParams stats::Binomial
 #' @inheritParams stats::Beta
-#' @param tol,max_iter arguments passed on to \code{\link{gen_hypergeo}}.
-#' @param p_tol,p_max_iter same as \code{tol}, \code{max_iter}.
-#' @param root_tol,root_max_iter arguments passed on to \code{\link[stats]{uniroot}}.
+#' @param prec arguments passed on to \code{\link[hypergeo2]{genhypergeo}},
+#' vectorized and recycled along with distribution parameters.
+#' @param tol,max_iter arguments passed on to \code{\link[stats]{uniroot}},
+#' vectorized and recycled along with distribution parameters.
 #'
 #' @return
 #' \code{dcbbinom} gives the density, \code{pcbbinom} the distribution function,
@@ -50,6 +56,8 @@
 #' @note Change log:
 #' \itemize{
 #'   \item{0.1.0 Xiurui Zhu - Initiate the function.}
+#'   \item{0.2.0 Xiurui Zhu - Re-implement distribution function with \code{\link[BH:BH-package]{BH}} package,
+#'     add \code{NULL} default tolerance, and add precision parameters.}
 #' }
 #'
 #' @references Ilienko, Andreii (2013). Continuous counterparts of Poisson and binomial
@@ -69,24 +77,27 @@
 #' rcbbinom(n = 10L, size = 10, alpha = 2, beta = 4)
 NULL
 
+# Normalize precision
+norm_prec <- function(prec) {
+  if (is.null(prec) == TRUE) {
+    NULL
+  } else {
+    res <- as.list(prec)
+    lapply(res, function(x) {if (is.null(x) == TRUE) NULL else as.integer(x)})
+  }
+}
+
 #' @aliases dcbbinom
-#' @section Numerical computation of the density function:
-#' For simplicity, the density function is computed numerically through differentiation.
-#' To achieve higher numerical resolution (given that \eqn{d\ln{u}/du>1,0<u<1}), it is computed as:
-#' \deqn{p(x|n,\alpha,\beta)=\frac{\partial{P(x|n,\alpha,\beta)}}{\partial{x}}=\frac{\partial\exp[\ln{P(x|n,\alpha,\beta)}]}{\partial{x}}}
-#' When simplified, it becomes:
-#' \deqn{p(x|n,\alpha,\beta)=\frac{\partial\exp[\ln{P(x|n,\alpha,\beta)}]}{\partial\ln{P(x|n,\alpha,\beta)}}\frac{\partial\ln{P(x|n,\alpha,\beta)}}{\partial{x}}=\frac{\partial\ln{P(x|n,\alpha,\beta)}}{\partial{x}}P(x|n,\alpha,\beta),}
-#' where the first term is computed numerically and the second term is the distribution function.
 #' @export
 #' @rdname cbbinom
-dcbbinom <- function(x, size, alpha = 1, beta = 1, ncp = 0,
-                     log = FALSE, tol = 1e-6, max_iter = 10000L) {
-  lp <- dcbblp(x, size, alpha, beta, tol, max_iter)
-  # To keep numerical resolution, compute log(p) originally
-  p <- base::log((lp[, 1L, drop = TRUE] - lp[, 2L, drop = TRUE]) / lp[, 3L, drop = TRUE]) +
-    pcbbinom(q = x, size = size, alpha = alpha, beta = beta,
-             lower.tail = TRUE, log.p = TRUE,
-             tol = tol, max_iter = max_iter)
+dcbbinom <- function(x, size, alpha = 1, beta = 1, ncp = 0, log = FALSE, prec = NULL) {
+  p <- cpp_dcbbinom(x = as.numeric(x - ncp),
+                    size = as.numeric(size),
+                    alpha = as.numeric(alpha),
+                    beta = as.numeric(beta),
+                    log = TRUE,
+                    prec = norm_prec(prec))
+  p[is.na(p) == TRUE] <- -Inf
   if (log == FALSE) {
     p <- exp(p)
   }
@@ -97,49 +108,43 @@ dcbbinom <- function(x, size, alpha = 1, beta = 1, ncp = 0,
 #' @export
 #' @rdname cbbinom
 pcbbinom <- function(q, size, alpha = 1, beta = 1, ncp = 0,
-                     lower.tail = TRUE, log.p = FALSE,
-                     tol = 1e-6, max_iter = 10000L) {
+                     lower.tail = TRUE, log.p = FALSE, prec = NULL) {
   cpp_pcbbinom(q = as.numeric(q - ncp),
                size = as.numeric(size),
                alpha = as.numeric(alpha),
                beta = as.numeric(beta),
                lower_tail = as.logical(lower.tail[[1L]]),
                log_p = as.logical(log.p[[1L]]),
-               tol = as.numeric(tol),
-               max_iter = as.integer(max_iter))
+               prec = norm_prec(prec))
 }
 
 #' @aliases qcbbinom
 #' @export
 #' @rdname cbbinom
 qcbbinom <- function(p, size, alpha = 1, beta = 1, ncp = 0,
-                     lower.tail = TRUE, log.p = FALSE,
-                     p_tol = 1e-6, p_max_iter = 10000L,
-                     root_tol = 1e-6, root_max_iter = 10000L) {
+                     lower.tail = TRUE, log.p = FALSE, prec = NULL,
+                     tol = 1e-6, max_iter = 10000L) {
   cpp_qcbbinom(p = as.numeric(p),
                size = as.numeric(size),
                alpha = as.numeric(alpha),
                beta = as.numeric(beta),
                lower_tail = as.logical(lower.tail[[1L]]),
                log_p = as.logical(log.p[[1L]]),
-               p_tol = as.numeric(p_tol),
-               p_max_iter = as.integer(p_max_iter),
-               root_tol = as.numeric(root_tol),
-               root_max_iter = as.integer(root_max_iter)) + ncp
+               prec = norm_prec(prec),
+               tol = as.numeric(tol),
+               max_iter = as.integer(max_iter)) + ncp
 }
 
 #' @aliases rcbbinom
 #' @export
 #' @rdname cbbinom
-rcbbinom <- function(n, size, alpha = 1, beta = 1, ncp = 0,
-                     p_tol = 1e-6, p_max_iter = 10000L,
-                     root_tol = 1e-6, root_max_iter = 10000L) {
+rcbbinom <- function(n, size, alpha = 1, beta = 1, ncp = 0, prec = NULL,
+                     tol = 1e-6, max_iter = 10000L) {
   cpp_rcbbinom(n = as.integer(n[[1L]]),
                size = as.numeric(size),
                alpha = as.numeric(alpha),
                beta = as.numeric(beta),
-               p_tol = as.numeric(p_tol),
-               p_max_iter = as.integer(p_max_iter),
-               root_tol = as.numeric(root_tol),
-               root_max_iter = as.integer(root_max_iter)) + ncp
+               prec = norm_prec(prec),
+               tol = as.numeric(tol),
+               max_iter = as.integer(max_iter)) + ncp
 }
